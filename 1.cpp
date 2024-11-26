@@ -30,11 +30,11 @@ int main(){
         }
 
         if(arr[mid] < target){
-            e = mid-1;
+            s = mid+1;
           }
 
         else{
-            s=mid+1;
+            e=mid-1;
         }
     }
     cout<<"Element not found";

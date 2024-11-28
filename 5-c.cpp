@@ -12,15 +12,23 @@ struct Item {
 
 // Structure to represent a node in the decision tree
 struct Node {
-    int level; // Index of the current item
+    int level;  // Index of the current item
     int profit; // Profit so far
     int weight; // Weight so far
     double bound; // Upper bound on profit
 };
 
+// Custom comparator for max-heap (priority queue)
+struct CompareBound {
+    bool operator()(Node const& a, Node const& b) {
+        return a.bound < b.bound; // Higher bound gets higher priority
+    }
+};
+
 // Function to calculate the upper bound on the maximum profit
-double calculateBound(Node u, int n, int W, vector<Item> &items) {
-    if (u.weight >= W) return 0; // If weight exceeds capacity, bound is 0
+double calculateBound(Node u, int n, int W, vector<Item>& items) {
+    if (u.weight >= W)
+        return 0; // If weight exceeds capacity, bound is 0
 
     double profitBound = u.profit;
     int totalWeight = u.weight;
@@ -46,15 +54,15 @@ bool cmp(Item a, Item b) {
 }
 
 // Function to solve the 0/1 Knapsack problem using Branch and Bound
-int knapsackBranchAndBound(int n, int W, vector<Item> &items) {
+int knapsackBranchAndBound(int n, int W, vector<Item>& items) {
     // Sort items by profit/weight ratio
     sort(items.begin(), items.end(), cmp);
 
-    // Initialize the priority queue (max heap)
-    priority_queue<Node> pq;
+    // Initialize the priority queue (max heap) with custom comparator
+    priority_queue<Node, vector<Node>, CompareBound> pq;
 
     // Create the root node
-    Node root = { -1, 0, 0, 0 };
+    Node root = {-1, 0, 0, 0};
     root.bound = calculateBound(root, n, W, items);
 
     // Push the root node to the priority queue
@@ -64,10 +72,12 @@ int knapsackBranchAndBound(int n, int W, vector<Item> &items) {
 
     // Branch and Bound algorithm
     while (!pq.empty()) {
-        Node u = pq.top(); pq.pop();
+        Node u = pq.top();
+        pq.pop();
 
         // If bound of u is less than maxProfit, skip this node
-        if (u.bound <= maxProfit) continue;
+        if (u.bound <= maxProfit)
+            continue;
 
         // Explore the next level (include/exclude the next item)
         Node v;
@@ -114,7 +124,7 @@ int main() {
     for (int i = 0; i < n; i++) {
         cout << "Enter weight and profit of item " << i + 1 << ": ";
         cin >> items[i].weight >> items[i].profit;
-        items[i].profitWeightRatio = (double) items[i].profit / items[i].weight;
+        items[i].profitWeightRatio = (double)items[i].profit / items[i].weight;
     }
 
     // Solve the problem using Branch and Bound
